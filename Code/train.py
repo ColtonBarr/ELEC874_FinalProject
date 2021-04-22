@@ -8,14 +8,23 @@ import pandas as pd
 import argparse
 import HelperFxns as fxns
 import os, sys
+import itertools
 
-from Classifiers import Classifier1
-
+from Classifier import Classifier
 
 def train(general_params):
 
     #Read in the data csv
     data_df = pd.read_csv(general_params['data_csv']) 
+
+    #Instantiate classifier object
+    classifier = Classifier()
+
+    #List all possible parameters
+    params = {'deep'  : [0,1],
+              'bnorm' : [0,1],
+              'drop'  : [0,1],
+              'skip'  : [0,1]}
 
     #Iterate through all folds
     for fold_num in range(general_params['num_folds']):
@@ -25,31 +34,56 @@ def train(general_params):
         if not os.path.exists(fold_dir):
             os.mkdir(fold_dir)
 
-        #Iterate through each model
-        for model in general_params['models']:
+        #Put all fold parameters in a dict
+        fold_params = {"fold_dir" : fold_dir,
+                       "fold_num" : fold_num,
+                       "data_df"  : data_df}
 
-            model.train(fold_dir, fold_num, data_df)
+        #Perform all network tests without and with augmented data
+        for aug in [0,1]:        
+
+            #Refresh the parameter generator
+            param_gen = (dict(zip(params, x)) for x in itertools.product(*params.values()))
+
+            #Read in the data according to the augmentation status
+            classifier.load_fold_data(fold_num, data_df, aug)
+
+            #Iterate through each possible parameter set in the param generator
+            for model_params in param_gen:
+
+                #Train the classifier
+                classifier.train(fold_params, model_params)
+
+
+# def test_classifiers():
+
+#     classifier = Classifier()
+    
+#     for aug in [0,1]:
+
+#         classifier.
+
+#         for deep in [0,1]:
+#             for bnorm in [0,1]:
+#                 for drop in [0,1]:
+#                     for skip in [0,1]:
+
+#                         c=BaseClassifier(aug=aug, deep=deep, bnorm=bnorm, drop=drop, skip=skip)
+#                         m = c.create_model()
+#                         print(m.summary())
+#                         print("----------------------------------------------------------")
 
 
 def main():
-
-    #Instantiate all classifier objects
-    models = [Classifier1()]
 
     #Parse flags
     data_csv = FLAGS.data_csv
     output_folder = FLAGS.save_path
     num_folds = int(FLAGS.num_folds)
 
-    #Get all model filenames to use
-    model_flag = int(FLAGS.model)
-    if model_flag != -1:
-        models = models[model_flag + 1]
-
     general_params = {"save_path"     : output_folder,
                       "num_folds"     : num_folds,
-                      "data_csv"      : data_csv,
-                      "models"        : models}
+                      "data_csv"      : data_csv}
 
     train(general_params)
 
@@ -73,12 +107,6 @@ if __name__ == '__main__':
         type=str,
         default='1',
         help='Number of folds used in the K fold cross validation scheme.'
-    )  
-    parser.add_argument(
-        '--model',
-        type=str,
-        default='-1',
-        help='The number of the specific model that you wish to use.'
     )  
 
     #Get input flag arguments

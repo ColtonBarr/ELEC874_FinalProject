@@ -14,6 +14,13 @@ from Classifiers import Classifier1
 
 def evaluate(general_params):
 
+    #Initialize a list to append results to
+    output = []
+    output.append(" ---------------------------------- ")
+    output.append("\n ------- Evaluation Results ------- ")
+    output.append("\n ---------------------------------- ")
+    output.append("")
+
     #Read in the data csv
     data_df = pd.read_csv(general_params['data_csv']) 
 
