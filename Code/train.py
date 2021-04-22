@@ -7,11 +7,12 @@ import numpy as np
 import pandas as pd
 import argparse
 import HelperFxns as fxns
+import os, sys
 
-from classifier_1 import Classifier1
+from Classifiers import Classifier1
 
 
-def train(self, general_params):
+def train(general_params):
 
     #Read in the data csv
     data_df = pd.read_csv(general_params['data_csv']) 
@@ -58,13 +59,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--data_csv',
         type=str,
-        default="C:\\repos\\Courses\\CISC867_CourseProject\\LabelledData\\CISC867_SampleDataset.csv",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\Code\\ELEC874_SampleDataset.csv",
         help='Path to the csv file containing locations for all data used in training'
     )
     parser.add_argument(
         '--save_path',
         type=str,
-        default="C:\\repos\\Courses\\CISC867_CourseProject\\Network_Outputs\\Test_4",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\Test_0",
         help='Path to the directory that contains the trained networks for each fold.'
     )   
     parser.add_argument(

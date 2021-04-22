@@ -6,8 +6,13 @@ in one location for easy importing and cleaner code elsewhere.
 import os, sys
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
-def saveTrainingInfo(saveLocation, foldNum, params, trainingHistory, results, networkType, confusion_matrix=[]):
+import tensorflow
+import tensorflow.keras
+from tensorflow.keras import backend as K
+
+def save_training_info(saveLocation, foldNum, params, trainingHistory, results, networkType, confusion_matrix=[]):
 
     metrics = params['metrics']
 
@@ -43,7 +48,7 @@ def saveTrainingInfo(saveLocation, foldNum, params, trainingHistory, results, ne
     with open(os.path.join(saveLocation,"trainingInfo_"+networkType+".txt"),'w') as f:
         f.writelines(LinesToWrite)
 
-def saveTrainingPlot(saveLocation, history, metric, networkType):
+def save_training_plot(saveLocation, history, metric, networkType):
     fig = plt.figure()
     numEpochs =len(history[metric])
 

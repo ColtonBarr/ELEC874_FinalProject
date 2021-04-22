@@ -7,11 +7,12 @@ import numpy as np
 import pandas as pd
 import argparse
 import HelperFxns as fxns
+import os, sys
 
-from classifier_1 import Classifier1
+from Classifiers import Classifier1
 
 
-def eval(self, general_params):
+def evaluate(general_params):
 
     #Read in the data csv
     data_df = pd.read_csv(general_params['data_csv']) 
@@ -19,15 +20,13 @@ def eval(self, general_params):
     #Iterate through all folds
     for fold_num in range(general_params['num_folds']):
 
-        #Create catch-all directory for current fold
+        #Determine the directory for the current fold
         fold_dir = general_params['save_path']+"\\Fold_"+str(fold_num)
-        if not os.path.exists(fold_dir):
-            os.mkdir(fold_dir)
 
         #Iterate through each model
         for model in general_params['models']:
 
-            model.train(fold_dir, fold_num, data_df)
+            model.evaluate(fold_dir, fold_num, data_df)
 
 
 def main():
@@ -37,7 +36,7 @@ def main():
 
     #Parse flags
     data_csv = FLAGS.data_csv
-    output_folder = FLAGS.save_path
+    output_folder = FLAGS.model_path
     num_folds = int(FLAGS.num_folds)
 
     #Get all model filenames to use
@@ -50,7 +49,7 @@ def main():
                       "data_csv"      : data_csv,
                       "models"        : models}
 
-    train(general_params)
+    evaluate(general_params)
 
 
 if __name__ == '__main__':
@@ -58,13 +57,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--data_csv',
         type=str,
-        default="C:\\repos\\Courses\\CISC867_CourseProject\\LabelledData\\CISC867_SampleDataset.csv",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\Code\\ELEC874_SampleDataset.csv",
         help='Path to the csv file containing locations for all data used in training'
     )
     parser.add_argument(
-        '--save_path',
+        '--model_path',
         type=str,
-        default="C:\\repos\\Courses\\CISC867_CourseProject\\Network_Outputs\\Test_4",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\Test_0",
         help='Path to the directory that contains the trained networks for each fold.'
     )   
     parser.add_argument(
