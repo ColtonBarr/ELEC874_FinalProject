@@ -31,7 +31,7 @@ class Classifier():
     def __init__(self, prefix="CNN"):
 
         #Establish default hyperparameters that child models can tweak
-        self.params = {"num_epochs"     : 1, #CHANGE TO 10
+        self.params = {"num_epochs"     : 10,
                         "batch_size"    : 8,
                         "learning_rate" : 0.0001,
                         "optimizer"     : tensorflow.keras.optimizers.Adam(learning_rate=0.0001),
@@ -110,8 +110,7 @@ class Classifier():
 
     #Load the model from the saved file
     def load_model(self, save_folder):
-        full_model_path = os.path.join(save_folder, self.name, self.name)
-        return tensorflow.keras.models.load_model(full_model_path)
+        return tensorflow.keras.models.load_model(save_folder)
 
     def random_flip(self, image):
         if random.choice([0,1]):
@@ -246,35 +245,24 @@ class Classifier():
 
         for metric in self.params["metrics"]:
             fxns.save_training_plot(output_dir, history.history, metric, self.name)
+ 
 
-
-    def evaluate(self, fold_params, model_params):
-
-        #Read in data for testing
-        test_imgs,test_labels = self.load_data(fold_params['fold_num'], "Test", fold_params['data_df'])
-
-        #onehot encode the labels
-        encoder = OneHotEncoder(handle_unknown='ignore')
-        test_labels = encoder.fit_transform(test_labels.reshape(-1,1)).toarray()
-
-        #Load the model
-        model = self.load_model(save_dir)
+    def evaluate(self, model):
 
         #Get network predictions on the test set
-        predictions = model.predict(x = test_imgs)
+        predictions = model.predict(x = self.test_imgs)
+        evaluation = model.evaluate(x = self.test_imgs,
+                                    y = self.test_labels,
+                                    batch_size = self.params['batch_size'])
+        accuracy = evaluation[1]
 
         #Process predictions
         predictions = np.argmax(predictions, axis=-1)
-        test_labels = np.argmax(test_labels, axis=-1)
+        test_labels = np.argmax(self.test_labels, axis=-1)
 
         confusion_matrix = sklearn.metrics.confusion_matrix(test_labels, predictions)
         overall_report = sklearn.metrics.classification_report(test_labels, predictions, target_names=["Cross-section", "Long-axis", "Undefined"] , digits=4)
 
-        print("---------------------------------------------------------------------")
-        print(" *** Classifier: " + self.name + " *** ")
-        print("Fold #" + str(fold_params['fold_num']) + " Results\n")
-        print(overall_report)
-        print("\n Confusion Matrix: \n")
-        print(confusion_matrix)
-        print("\n---------------------------------------------------------------------")        
+        return accuracy, confusion_matrix, overall_report
+    
        

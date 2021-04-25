@@ -55,25 +55,6 @@ def train(general_params):
                 classifier.train(fold_params, model_params)
 
 
-# def test_classifiers():
-
-#     classifier = Classifier()
-    
-#     for aug in [0,1]:
-
-#         classifier.
-
-#         for deep in [0,1]:
-#             for bnorm in [0,1]:
-#                 for drop in [0,1]:
-#                     for skip in [0,1]:
-
-#                         c=BaseClassifier(aug=aug, deep=deep, bnorm=bnorm, drop=drop, skip=skip)
-#                         m = c.create_model()
-#                         print(m.summary())
-#                         print("----------------------------------------------------------")
-
-
 def main():
 
     #Parse flags
@@ -93,19 +74,19 @@ if __name__ == '__main__':
     parser.add_argument(
         '--data_csv',
         type=str,
-        default="C:\\repos\\Courses\\ELEC874_FinalProject\\Code\\ELEC874_SampleDataset.csv",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\Code\\ELEC874_FullDataset.csv",
         help='Path to the csv file containing locations for all data used in training'
     )
     parser.add_argument(
         '--save_path',
         type=str,
-        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\Test_0",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\All_Combinations",
         help='Path to the directory that contains the trained networks for each fold.'
     )   
     parser.add_argument(
         '--num_folds',
         type=str,
-        default='1',
+        default='4',
         help='Number of folds used in the K fold cross validation scheme.'
     )  
 

@@ -8,53 +8,158 @@ import pandas as pd
 import argparse
 import HelperFxns as fxns
 import os, sys
+import itertools
+from pathlib import Path
 
-from Classifiers import Classifier1
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
 
+from Classifier import Classifier
+
+
+def generate_model_name(param_set_dict):
+    flag_strs = list(param_set_dict.keys())
+    flag_bools = list(param_set_dict.values())
+
+    suffix = '_'.join(tuple([flag_strs[i] for i in range(5) if flag_bools[i]]))
+
+    return "CNN_" + suffix
 
 def evaluate(general_params):
 
     #Initialize a list to append results to
-    output = []
-    output.append(" ---------------------------------- ")
-    output.append("\n ------- Evaluation Results ------- ")
-    output.append("\n ---------------------------------- ")
-    output.append("")
+    report = []
+    report.append(" --------------------------------------------- ")
+    report.append("\n ------- Individual Classifier Results ------- ")
+    report.append("\n --------------------------------------------- \n")
 
     #Read in the data csv
     data_df = pd.read_csv(general_params['data_csv']) 
 
+    #Instantiate classifier object
+    classifier = Classifier()
+
+    #List all possible parameters
+    params = {'aug'   : [0,1],
+              'deep'  : [0,1],
+              'bnorm' : [0,1],
+              'drop'  : [0,1],
+              'skip'  : [0,1]}
+
+    results_dicts = []
+
     #Iterate through all folds
     for fold_num in range(general_params['num_folds']):
 
+        report.append("\n ~~~ Fold 0 ~~~ \n\n")
+
+        #Read in the data according to the augmentation status
+        classifier.load_fold_data(fold_num, data_df)
+
         #Determine the directory for the current fold
-        fold_dir = general_params['save_path']+"\\Fold_"+str(fold_num)
+        fold_dir = general_params['model_path']+"\\Fold_"+str(fold_num)
+
+        #Generate all possible combinations of all the params
+        param_gen = (dict(zip(params, x)) for x in itertools.product(*params.values()))
 
         #Iterate through each model
-        for model in general_params['models']:
+        for param_set in param_gen:
 
-            model.evaluate(fold_dir, fold_num, data_df)
+            #Load the model with the corresponding parameters
+            model_name = generate_model_name(param_set)
+            full_model_path = os.path.join(fold_dir, model_name, model_name)            
+            model = classifier.load_model(full_model_path)
+
+            #Get overall performance information
+            accuracy, confusion_matrix, overall_report = classifier.evaluate(model)
+
+            #Append information to the report
+            report.append("---------------------------------------------------------------------\n")
+            report.append(" --- Classifier: " + model_name + " --- \n\n")
+            report.append(str(overall_report))
+            report.append("\n Confusion Matrix: \n\n")
+            report.append(str(confusion_matrix) + "\n")
+            report.append("\n---------------------------------------------------------------------\n")    
+
+            #Add the accuracy to the param dict and append to a collector list
+            param_set['accuracy'] = accuracy
+            results_dicts.append(param_set)
+
+    #Initialize a new list for the ANOVA results
+    anova_report = []
+
+    anova_report.append(" --------------------------------------------- ")
+    anova_report.append("\n --------------- ANOVA Results --------------- ")
+    anova_report.append("\n --------------------------------------------- \n")
+
+    #Generate a dataframe from the list of dicts
+    results_df = pd.DataFrame(results_dicts)
+
+    #Interate through all independent variables
+    for var in params.keys():
+
+        #Perform a 1 way ANOVA for each parameter
+        model = ols('accuracy ~ C(' + var + ')', data=results_df).fit()
+        anova_table = sm.stats.anova_lm(model, typ=2)
+
+        print(" ~~~ " + var + " ~~~ ")
+        print(anova_table)
+        
+        #Append information to the results list
+        anova_report.append(" ~~~ " + var + " ~~~ \n\n")
+        anova_report.append(str(anova_table) + "\n")
+        anova_report.append("\n\n") 
+
+
+    #Insert the anova report at the start of the overall report
+    for ln in reversed(anova_report):
+
+        report.insert(0, ln)
+
+    #Determine the classifier with the highest accuracy
+    sorted_df = results_df.sort_values(by=['accuracy'], ascending=False)
+      
+    #Add the top 3 classifiers to another list
+    top_report = []
+    top_report.append("   --------------------------------------------- ")
+    top_report.append("\n ---------- Top Performing Networks --------- ")
+    top_report.append("\n --------------------------------------------- \n\n")    
+
+    for i in range(3):
+
+        ith_dict = dict(sorted_df.iloc[i])
+
+        model_name = generate_model_name(ith_dict)
+
+        top_report.append(" #" + str(i) + " Network: " + model_name + "\n")
+        top_report.append(" Accuracy: " + str(ith_dict['accuracy']) + "\n\n")
+
+
+    #Insert the topreport at the start of the overall report
+    for ln in reversed(top_report):
+
+        report.insert(0, ln)
+
+        
+
+    with open(os.path.join(general_params['report_path'], "EvaluationReport.txt"),'w') as f:
+        f.writelines(report)
+
+
 
 
 def main():
 
-    #Instantiate all classifier objects
-    models = [Classifier1()]
-
     #Parse flags
     data_csv = FLAGS.data_csv
-    output_folder = FLAGS.model_path
+    model_folder = FLAGS.model_path
     num_folds = int(FLAGS.num_folds)
+    report_path = FLAGS.report_path
 
-    #Get all model filenames to use
-    model_flag = int(FLAGS.model)
-    if model_flag != -1:
-        models = models[model_flag + 1]
-
-    general_params = {"save_path"     : output_folder,
+    general_params = {"model_path"     : model_folder,
                       "num_folds"     : num_folds,
                       "data_csv"      : data_csv,
-                      "models"        : models}
+                      "report_path"   : report_path}
 
     evaluate(general_params)
 
@@ -70,7 +175,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--model_path',
         type=str,
-        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\Test_0",
+        default="C:\\repos\\Courses\\ELEC874_FinalProject\\NetworkOutputs\\All_Combinations",
         help='Path to the directory that contains the trained networks for each fold.'
     )   
     parser.add_argument(
@@ -80,9 +185,9 @@ if __name__ == '__main__':
         help='Number of folds used in the K fold cross validation scheme.'
     )  
     parser.add_argument(
-        '--model',
+        '--report_path',
         type=str,
-        default='-1',
+        default='C:\\repos\\Courses\\ELEC874_FinalProject',
         help='The number of the specific model that you wish to use.'
     )  
 
