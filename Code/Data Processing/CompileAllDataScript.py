@@ -25,7 +25,7 @@ ex04_ids = [x for x in all_seq_ids if x.startswith("NP01")]
 #Fold 0: Test set == MS03
 #Fold 0: Test set == MS02
 #Fold 0: Test set == MS01
-
+'''
 fold_0_ids = {'Train' : ms01_ids[:4] + ms02_ids[:4] + ms03_ids[:4] + ex01_ids[:4] + ex02_ids[:4] + ex03_ids[:4],
               'Validation'   : [ms01_ids[4],  ms02_ids[4],   ms03_ids[4], ex01_ids[4], ex02_ids[4], ex03_ids[4]],
               'Test'  : ms04_ids + ex04_ids}
@@ -39,13 +39,14 @@ fold_3_ids = {'Train' : ms02_ids[:4] + ms03_ids[:4] + ms04_ids[:4] + ex02_ids[:4
               'Validation'   : [ms02_ids[4],  ms03_ids[4],   ms04_ids[4], ex02_ids[4], ex03_ids[4], ex04_ids[4]],
               'Test'  : ms01_ids + ex01_ids}
 all_folds = [fold_0_ids, fold_1_ids, fold_2_ids, fold_3_ids]
+'''
 
-'''
-fold_0_ids = {'Train' : [ms01_ids[1], ms01_ids[2], ms01_ids[3]],
-              'Validation'   : [ms01_ids[4]],
-              'Test'  : [ms01_ids[0]]}
+fold_0_ids = {'Train' : [ms02_ids[1], ms02_ids[2], ms02_ids[3]],
+              'Validation'   : [ms02_ids[4]],
+              'Test'  : [ms02_ids[0]]}
 all_folds = [fold_0_ids]
-'''
+
+
 
 
 #Initialize a blank dataframe
@@ -79,7 +80,7 @@ for fold_num, fold_dict in enumerate(all_folds):
             #Add the fold, set and directory as columns in this dataframe
             curr_df['Fold']   = str(fold_num)
             curr_df['Set']    = str(section)
-            curr_df['Folder'] = "FullDataset\\" + seq_id
+            curr_df['Folder'] = "SampleDataset\\" + seq_id
 
             dataset_df = pd.concat([dataset_df, curr_df], ignore_index=True)
 
@@ -92,4 +93,4 @@ us_tasks = np.array(dataset_df['US_Pose'].unique())
 print("All US poses after: " + str(us_tasks))
 
 #Write the resulting df to a csv
-dataset_df.to_csv(output_dir + "ELEC874_FullDataset.csv")
+dataset_df.to_csv(output_dir + "ELEC874_SampleDataset.csv")
