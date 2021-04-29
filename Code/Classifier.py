@@ -20,11 +20,12 @@ import sklearn
 import sklearn.metrics
 from scipy.ndimage.interpolation import rotate, zoom
 
-###############################################################################
-# --- Base Classifier Class -- 
-# This is the object that all other classifiers will inherit from.
-# They can reimplement or extend any methods and parameters that are
-# unique in that given implementation.
+'''--- Classifier Class -- 
+This is the class that will generate each possible architecture used in this experiment.
+
+It will take advantage of a model building method that can customize the specific architecture,
+as well as training and evaluation methods that work with any generic classifier.
+'''
 
 class Classifier():
 
@@ -38,6 +39,7 @@ class Classifier():
                         "loss_fxn"      : 'categorical_crossentropy',
                         "metrics"       : ['accuracy']}
 
+        #Instantiate class variables
         self.prefix = prefix
         self.aug = None
         self.deep = None
@@ -112,15 +114,18 @@ class Classifier():
     def load_model(self, save_folder):
         return tensorflow.keras.models.load_model(save_folder)
 
+    #Performs a random flip across the y axis
     def random_flip(self, image):
         if random.choice([0,1]):
             return cv2.flip(image, 1)
         return image
 
+    #Randomly dims the image
     def random_brightness(self, image):
         value = random.choice([1, 2, 5, 10, 20])
         return np.where((0 + image) < value,0,image-value)
 
+    #Returns an image that has been randomly augmented
     def augment_image(self, image):
         rot_img = self.random_brightness(self.random_flip(image))
         return rot_img
@@ -161,16 +166,19 @@ class Classifier():
 
         return np.array(images), np.array(imageLabels)
 
+    #Perform resizing and scaling of the input US images
     def process_ultrasound(self, image):
         resized = cv2.resize(image, (128, 128)).astype(np.float16)
         scaled = resized / resized.max()
         return scaled[...,np.newaxis]
 
+    #Save the model to a file
     def save_model(self, model, save_folder):
         full_model_path = os.path.join(save_folder, self.name)
         model.save(full_model_path)
         return
 
+    #Loads the specific data used for the current fold
     def load_fold_data(self, fold_num, data_df, aug=False):
 
         self.aug = aug
@@ -180,17 +188,14 @@ class Classifier():
         self.val_imgs, self.val_labels = self.load_data(fold_num, "Validation", data_df)
         self.test_imgs, self.test_labels = self.load_data(fold_num, "Test", data_df)
 
-        # print("-------------------------------------------")
-        # print("Train: {}".format(collections.Counter(train_labels)))
-        # print("Val: {}".format(collections.Counter(val_labels)))
-        # print("Test: {}".format(collections.Counter(test_labels)))
-
         #onehot encode the labels
         encoder = OneHotEncoder(handle_unknown='ignore')
         self.train_labels = encoder.fit_transform(self.train_labels.reshape(-1,1)).toarray()
         self.val_labels = encoder.fit_transform(self.val_labels.reshape(-1,1)).toarray()
         self.test_labels = encoder.fit_transform(self.test_labels.reshape(-1,1)).toarray()
 
+    #Takes the current class variables for the network properties and generates 
+    #a string that names the architecture.
     def generate_model_name(self):
         flag_strs = ['aug','deep','bnorm','drop','skip']
         flag_bools = [self.aug, self.deep, self.bnorm, self.drop, self.skip]
@@ -199,6 +204,8 @@ class Classifier():
 
         return self.prefix + "_" + suffix
     
+    #The main training method. Generates a model based on model_params followed by
+    #training, validation and testing the model.
     def train(self, fold_params, model_params):
 
         #Set flags as the model wide parameters
@@ -219,6 +226,7 @@ class Classifier():
         model = self.create_model()
         print(model.summary())
 
+        #Compile and fit the model.
         model.compile(optimizer = self.params['optimizer'], loss = self.params['loss_fxn'], metrics = self.params['metrics'])        
         history = model.fit(x=self.train_imgs,
                             y=self.train_labels,
@@ -227,6 +235,7 @@ class Classifier():
                             epochs = self.params['num_epochs'],
                             callbacks=[EarlyStopping(monitor='val_loss', patience=2, restore_best_weights=True)])
 
+        #Test the model
         results = model.evaluate(x = self.test_imgs,
                                     y = self.test_labels,
                                     batch_size = self.params['batch_size'])
@@ -239,14 +248,14 @@ class Classifier():
         test_labels_argmax = np.argmax(self.test_labels, axis=-1)
         confusion_matrix = sklearn.metrics.confusion_matrix(test_labels_argmax, predictions)
 
+        #Save output info to quantify performance.
         fxns.save_training_info(output_dir, fold_params['fold_num'], self.params, history.history, results, self.name, confusion_matrix)
-
         fxns.save_training_plot(output_dir, history.history, "loss", self.name)
 
         for metric in self.params["metrics"]:
             fxns.save_training_plot(output_dir, history.history, metric, self.name)
  
-
+    #Strictly test the network and return the raw results.
     def evaluate(self, model):
 
         #Get network predictions on the test set
@@ -260,6 +269,7 @@ class Classifier():
         predictions = np.argmax(predictions, axis=-1)
         test_labels = np.argmax(self.test_labels, axis=-1)
 
+        #Generate the confusion matrix and overall report
         confusion_matrix = sklearn.metrics.confusion_matrix(test_labels, predictions)
         overall_report = sklearn.metrics.classification_report(test_labels, predictions, target_names=["Cross-section", "Long-axis", "Undefined"] , digits=4)
 

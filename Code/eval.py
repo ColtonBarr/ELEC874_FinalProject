@@ -1,5 +1,5 @@
 '''
-This file encapsulates the training and evaluation script for 
+This file encapsulates the evaluation script for 
 all the models.
 '''
 
@@ -10,13 +10,12 @@ import HelperFxns as fxns
 import os, sys
 import itertools
 from pathlib import Path
-
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
 from Classifier import Classifier
 
-
+#Taken from the Classifier class; used to generate a model's name string from parameters.
 def generate_model_name(param_set_dict):
     flag_strs = list(param_set_dict.keys())
     flag_bools = list(param_set_dict.values())
@@ -25,6 +24,9 @@ def generate_model_name(param_set_dict):
 
     return "CNN_" + suffix
 
+#The core evaluation function. It creates each model and calls the .evaluate() method,
+#followed by processing and writing the results to collector lists for eventual generation
+#of an output .txt file.
 def evaluate(general_params):
 
     #Initialize a list to append results to
@@ -119,28 +121,27 @@ def evaluate(general_params):
     #Determine the classifier with the highest accuracy
     sorted_df = results_df.sort_values(by=['accuracy'], ascending=False)
       
-    #Add the top 3 classifiers to another list
+    #Add all the classifiers to another list
     top_report = []
     top_report.append(" --------------------------------------------- ")
     top_report.append("\n ---------- Top Performing Networks ---------- ")
     top_report.append("\n --------------------------------------------- \n\n")    
 
+    #Iterate through all classifiers
     for i in range(32):
 
+        #Get the ith model name and accuracy
         ith_dict = dict(sorted_df.iloc[i])
-
         model_name = generate_model_name(ith_dict)
 
         top_report.append(" #" + str(i+1) + " Network: " + model_name + "\n")
         top_report.append(" Accuracy: " + str(ith_dict['accuracy']) + "\n\n")
 
-
     #Insert the topreport at the start of the overall report
     for ln in reversed(top_report):
-
         report.insert(0, ln)
-        
 
+    #Write the results to the evaluation report file.
     with open(os.path.join(general_params['report_path'], "EvaluationReport.txt"),'w') as f:
         f.writelines(report)
 
@@ -154,11 +155,13 @@ def main():
     num_folds = int(FLAGS.num_folds)
     report_path = FLAGS.report_path
 
+    #Generate output dict
     general_params = {"model_path"     : model_folder,
                       "num_folds"     : num_folds,
                       "data_csv"      : data_csv,
                       "report_path"   : report_path}
 
+    #Call evaluate function
     evaluate(general_params)
 
 
@@ -186,7 +189,7 @@ if __name__ == '__main__':
         '--report_path',
         type=str,
         default='C:\\repos\\Courses\\ELEC874_FinalProject',
-        help='The number of the specific model that you wish to use.'
+        help='The directory to save the evaluation report in.'
     )  
 
     #Get input flag arguments

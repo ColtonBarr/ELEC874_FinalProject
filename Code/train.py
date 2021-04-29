@@ -1,5 +1,5 @@
 '''
-This file encapsulates the training and evaluation script for 
+This file encapsulates the training script for 
 all the models.
 '''
 
@@ -12,6 +12,9 @@ import itertools
 
 from Classifier import Classifier
 
+#The main training function. For each fold, it loops through all possible combinations of
+#the parameters listed in params, before generating a model for each combination and calling
+#each model's train function.
 def train(general_params):
 
     #Read in the data csv
@@ -62,10 +65,12 @@ def main():
     output_folder = FLAGS.save_path
     num_folds = int(FLAGS.num_folds)
 
+    #Save key params in a dict
     general_params = {"save_path"     : output_folder,
                       "num_folds"     : num_folds,
                       "data_csv"      : data_csv}
 
+    #Call the train function
     train(general_params)
 
 
