@@ -121,17 +121,17 @@ def evaluate(general_params):
       
     #Add the top 3 classifiers to another list
     top_report = []
-    top_report.append("   --------------------------------------------- ")
-    top_report.append("\n ---------- Top Performing Networks --------- ")
+    top_report.append(" --------------------------------------------- ")
+    top_report.append("\n ---------- Top Performing Networks ---------- ")
     top_report.append("\n --------------------------------------------- \n\n")    
 
-    for i in range(3):
+    for i in range(32):
 
         ith_dict = dict(sorted_df.iloc[i])
 
         model_name = generate_model_name(ith_dict)
 
-        top_report.append(" #" + str(i) + " Network: " + model_name + "\n")
+        top_report.append(" #" + str(i+1) + " Network: " + model_name + "\n")
         top_report.append(" Accuracy: " + str(ith_dict['accuracy']) + "\n\n")
 
 
@@ -139,12 +139,10 @@ def evaluate(general_params):
     for ln in reversed(top_report):
 
         report.insert(0, ln)
-
         
 
     with open(os.path.join(general_params['report_path'], "EvaluationReport.txt"),'w') as f:
         f.writelines(report)
-
 
 
 

@@ -1,15 +1,102 @@
-   --------------------------------------------- 
- ---------- Top Performing Networks --------- 
+ --------------------------------------------- 
+ ---------- Top Performing Networks ---------- 
  --------------------------------------------- 
 
- #0 Network: CNN_aug_deep_bnorm
+ #1 Network: CNN_aug_deep_bnorm
  Accuracy: 0.970268726348877
 
- #1 Network: CNN_aug_bnorm
+ #2 Network: CNN_aug_bnorm
  Accuracy: 0.9656946659088135
 
- #2 Network: CNN_bnorm
+ #3 Network: CNN_bnorm
  Accuracy: 0.9651229381561279
+
+ #4 Network: CNN_aug_bnorm_drop
+ Accuracy: 0.9645511507987976
+
+ #5 Network: CNN_aug_drop
+ Accuracy: 0.9645511507987976
+
+ #6 Network: CNN_aug_bnorm_skip
+ Accuracy: 0.9622641801834106
+
+ #7 Network: CNN_aug_skip
+ Accuracy: 0.9599771499633789
+
+ #8 Network: CNN_aug_bnorm_drop_skip
+ Accuracy: 0.958833634853363
+
+ #9 Network: CNN_bnorm_drop_skip
+ Accuracy: 0.9582618474960327
+
+ #10 Network: CNN_
+ Accuracy: 0.955974817276001
+
+ #11 Network: CNN_drop
+ Accuracy: 0.9554030895233154
+
+ #12 Network: CNN_aug
+ Accuracy: 0.9531160593032837
+
+ #13 Network: CNN_bnorm_drop
+ Accuracy: 0.9531160593032837
+
+ #14 Network: CNN_aug_deep
+ Accuracy: 0.9525443315505981
+
+ #15 Network: CNN_skip
+ Accuracy: 0.9496855139732361
+
+ #16 Network: CNN_drop_skip
+ Accuracy: 0.9496855139732361
+
+ #17 Network: CNN_bnorm_skip
+ Accuracy: 0.9485419988632202
+
+ #18 Network: CNN_aug_deep_drop
+ Accuracy: 0.9462550282478333
+
+ #19 Network: CNN_aug_deep_skip
+ Accuracy: 0.9456832408905029
+
+ #20 Network: CNN_deep_drop
+ Accuracy: 0.9416809678077698
+
+ #21 Network: CNN_aug_deep_bnorm_skip
+ Accuracy: 0.9411091804504395
+
+ #22 Network: CNN_aug_deep_bnorm_drop
+ Accuracy: 0.9405374526977539
+
+ #23 Network: CNN_aug_drop_skip
+ Accuracy: 0.9405374526977539
+
+ #24 Network: CNN_aug_deep_drop_skip
+ Accuracy: 0.9382504224777222
+
+ #25 Network: CNN_deep_skip
+ Accuracy: 0.9382504224777222
+
+ #26 Network: CNN_deep_bnorm_drop
+ Accuracy: 0.9365351796150208
+
+ #27 Network: CNN_deep
+ Accuracy: 0.9359633922576904
+
+ #28 Network: CNN_deep_bnorm
+ Accuracy: 0.9302458763122559
+
+ #29 Network: CNN_deep_bnorm_skip
+ Accuracy: 0.9268153309822083
+
+ #30 Network: CNN_deep_bnorm_drop_skip
+ Accuracy: 0.9262435436248779
+
+ #31 Network: CNN_deep_drop_skip
+ Accuracy: 0.9233847856521606
+
+ #32 Network: CNN_aug_deep_bnorm_drop_skip
+ Accuracy: 0.9233847856521606
 
  --------------------------------------------- 
  --------------- ANOVA Results --------------- 
