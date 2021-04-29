@@ -1,0 +1,19 @@
+Fold 0/0
+Network type: CNN_aug_bnorm_skip
+Number of Epochs: 4
+Batch size: 8
+Loss function: categorical_crossentropy
+
+Training Statistics: 
+	Final training loss: 0.03938789293169975
+	Final training accuracy: 0.9895568490028381
+	Final validation loss: 0.14160408079624176
+	Final validation accuracy: 0.9606289267539978
+
+Testing Statistics: 
+	Test loss: 0.292753130197525
+	Test accuracy: 0.9307700395584106
+
+[[12209   274   961]
+ [  318  1550   140]
+ [  516   355 20713]]

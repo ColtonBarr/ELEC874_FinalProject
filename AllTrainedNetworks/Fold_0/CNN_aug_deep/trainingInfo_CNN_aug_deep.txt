@@ -1,0 +1,19 @@
+Fold 0/0
+Network type: CNN_aug_deep
+Number of Epochs: 6
+Batch size: 8
+Loss function: categorical_crossentropy
+
+Training Statistics: 
+	Final training loss: 0.09565502405166626
+	Final training accuracy: 0.9749788045883179
+	Final validation loss: 0.09866532683372498
+	Final validation accuracy: 0.9603144526481628
+
+Testing Statistics: 
+	Test loss: 0.22913360595703125
+	Test accuracy: 0.9353331923484802
+
+[[12312   232   900]
+ [  270  1578   160]
+ [  416   417 20751]]

@@ -1,0 +1,19 @@
+Fold 0/0
+Network type: CNN_bnorm_drop
+Number of Epochs: 7
+Batch size: 8
+Loss function: categorical_crossentropy
+
+Training Statistics: 
+	Final training loss: 0.05791148543357849
+	Final training accuracy: 0.9849978685379028
+	Final validation loss: 0.09788019955158234
+	Final validation accuracy: 0.9733333587646484
+
+Testing Statistics: 
+	Test loss: 0.28241947293281555
+	Test accuracy: 0.924721896648407
+
+[[3022   29  310]
+ [ 124  317   61]
+ [  87   86 5223]]
