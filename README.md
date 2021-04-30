@@ -21,7 +21,7 @@ Ensure that you activate the environment and change your working directory to th
 
 Since the full dataset has a ~30hr training time, a sample dataset has been created to demonstrate this project's full training and evaluation pipeline. The sample dataset can be downloaded [here](https://queensuca-my.sharepoint.com/:u:/g/personal/14cb49_queensu_ca/EaEJLcUIC71IlSNDg2svNzIBrG1Uc5LnxOtc0DNxda7UaQ?e=V5wM47).
 
-Download and extract the folder *SampleDataset* to the cloned folder for this repository, such that the parent folder for *LabelledData* is *ELEC874_FinalProject*.
+Download and extract the folder *SampleDataset* to the cloned folder for this repository, such that the parent folder for *SampleDataset* is *ELEC874_FinalProject*.
 
 ## Training
 
